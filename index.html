@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ভার্টেক্স এডুকেয়ার পাবনা</title>
+    <!-- Importing Google Fonts for professional Bengali and English typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Light Theme */
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --primary: #2563eb;
+            --secondary: #059669;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: rgba(37, 99, 235, 0.1);
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            --loader-bg: #ffffff;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme */
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --primary: #60a5fa;
+            --secondary: #34d399;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            --loader-bg: #0f172a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Hind Siliguri', 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            transition: var(--transition);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* --- Loading Overlay --- */
+        #loader-wrapper {
+            position: fixed;
+            inset: 0;
+            background: var(--loader-bg);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        .loader-logo {
+            width: 90px;
+            margin-bottom: 25px;
+            fill: var(--primary);
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        .loader-bar-container {
+            width: 180px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .loader-progress {
+            width: 0%;
+            height: 100%;
+            background: var(--primary);
+            animation: progress 2s forwards ease-in-out;
+        }
+
+        @keyframes progress { to { width: 100%; } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); opacity: 0.8; } }
+
+        /* --- Theme Toggle --- */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover { transform: scale(1.1); }
+        .theme-toggle svg { width: 22px; height: 22px; fill: var(--primary); }
+
+        /* --- Header --- */
+        header {
+            padding: clamp(2rem, 5vh, 4rem) 1.5rem;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            max-width: 1200px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .header-logo { width: clamp(60px, 10vw, 80px); fill: var(--primary); }
+
+        .header-text h1 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .header-text h3 {
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            color: var(--secondary);
+            font-weight: 500;
+            margin-top: 5px;
+        }
+
+        /* --- Main Content --- */
+        main {
+            flex: 1;
+            padding: clamp(2rem, 6vh, 4rem) 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .content-card {
+            background: var(--bg-card);
+            padding: clamp(2rem, 5vw, 3.5rem);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slideUp 0.8s forwards 2.2s;
+        }
+
+        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+
+        .msg-en { font-size: 1.15rem; margin-bottom: 1.5rem; color: var(--text-main); }
+        .msg-bn { font-size: 1.25rem; color: var(--text-main); font-weight: 500; }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 2.5rem 0;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .divider::after {
+            content: "-";
+            background: var(--bg-card);
+            padding: 0 15px;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+        }
+
+        /* --- Contact List System --- */
+        .contact-list {
+            text-align: left;
+            display: inline-block;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 12px;
+            transition: var(--transition);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .contact-item:hover {
+            background: var(--bg-body);
+            transform: translateX(10px);
+        }
+
+        .icon-box {
+            background: var(--primary);
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .icon-box svg { width: 22px; height: 22px; fill: #fff; }
+
+        .contact-details b {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .contact-details span {
+            font-size: 1.05rem;
+            font-weight: 500;
+        }
+
+        /* --- Footer --- */
+        footer {
+            padding: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            background: var(--bg-card);
+        }
+
+        /* Responsive Mobile Adjustments */
+        @media (max-width: 600px) {
+            header { padding: 2rem 1rem; }
+            .header-content { flex-direction: column; gap: 10px; }
+            .content-card { padding: 1.5rem; }
+            .contact-item:hover { transform: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" id="theme-btn" title="Toggle Mode">
+        <svg id="theme-icon" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5-5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/></svg>
+    </button>
+
+    <!-- Full Screen Loader -->
+    <div id="loader-wrapper">
+        <svg class="loader-logo" viewBox="0 0 24 24">
+            <path d="https://raw.githubusercontent.com/silentfort/vertexedu/refs/heads/main/favicon.ico"/>
+        </svg>
+        <div class="loader-bar-container">
+            <div class="loader-progress"></div>
+        </div>
+    </div>
+
+    <!-- Header Section -->
+    <header>
+        <div class="header-content">
+            <svg class="header-logo" viewBox="0 0 24 24">
+                <path d="https://raw.githubusercontent.com/silentfort/vertexedu/refs/heads/main/favicon.ico"/>
+            </svg>
+            <div class="header-text">
+                <h1>ভার্টেক্স এডুকেয়ার পাবনা</h1>
+                <h3>সেবাই আমাদের ব্রত</h3>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="content-card">
+            <p class="msg-en">Our website is currently under construction. We are improving our academic services and online resources to provide a better experience. We will be live soon!</p>
+            <p class="msg-bn">আমাদের ওয়েবসাইটটি বর্তমানে উন্নয়নের কাজ চলছে। আপনাদের আরও উন্নত একাডেমিক সেবা ও অনলাইন রিসোর্স প্রদানের লক্ষ্যে আমরা কাজ করছি। শীঘ্রই আমরা ফিরছি!</p>
+            
+            <div class="divider"></div>
+
+            <!-- Contact Information List -->
+            <div class="contact-list">
+                <!-- Location -->
+                <div class="contact-item">
+                    <div class="icon-box">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                    </div>
+                    <div class="contact-details">
+                        <b>ঠিকানা / Location</b>
+                        <span>চুনু হাজীর বাড়ি, চারতোলা মোড়, কফিলউদ্দিন পাড়া, দিলালপুর পাবনা।</span>
+                    </div>
+                </div>
+
+                <!-- Phone -->
+                <a href="tel:+8801780689741" class="contact-item">
+                    <div class="icon-box">
+                        <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                    </div>
+                    <div class="contact-details">
+                        <b>মোবাইল / Phone</b>
+                        <span>+৮৮০ ১৭৮০-৬৮৯৭৪১</span>
+                    </div>
+                </a>
+
+                <!-- Email -->
+                <a href="mailto:info@vertexeducare.com" class="contact-item">
+                    <div class="icon-box">
+                        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                    </div>
+                    <div class="contact-details">
+                        <b>ইমেইল / Email</b>
+                        <span>info@vertexeducare.com</span>
+                    </div>
+                </a>
+
+                <!-- Hours -->
+                <div class="contact-item">
+                    <div class="icon-box">
+                        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                    </div>
+                    <div class="contact-details">
+                        <b>সময় / Office Hours</b>
+                        <span>সকাল ৯:০০ - সন্ধ্যা ৭:০০ (শনি-বৃহস্পতি)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        &copy; <span id="year"></span> ভার্টেক্স এডুকেয়ার পাবনা | সর্বস্বত্ব সংরক্ষিত
+    </footer>
+
+    <script>
+        // Loader Logic
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loader-wrapper');
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                loader.style.visibility = 'hidden';
+                document.body.style.overflow = 'auto';
+            }, 2000);
+        });
+
+        // Theme System
+        const themeBtn = document.getElementById('theme-btn');
+        const themeIcon = document.getElementById('theme-icon');
+        const sunIcon = `<path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0s-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41l-1.06-1.06zm1.06-12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.39.39-1.03 0-1.41zm-12.37 12.37c-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06c.39-.39.39-1.03 0-1.41z"/>`;
+        const moonIcon = `<path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5-5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>`;
+
+        function updateTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            themeIcon.innerHTML = theme === 'dark' ? sunIcon : moonIcon;
+            localStorage.setItem('preferred-theme', theme);
+        }
+
+        // Auto-switch based on device preference
+        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
+        const savedTheme = localStorage.getItem('preferred-theme');
+
+        if (savedTheme) {
+            updateTheme(savedTheme);
+        } else {
+            updateTheme(systemTheme.matches ? 'dark' : 'light');
+        }
+
+        themeBtn.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            updateTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        systemTheme.addEventListener('change', (e) => {
+            if (!localStorage.getItem('preferred-theme')) {
+                updateTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+
+        // Year update
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
